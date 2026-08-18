@@ -1,0 +1,76 @@
+
+#include <windows.h>
+#include "resource.h"
+void OnCommnd(HWND hwnd,
+	WPARAM wParam,
+	LPARAM lParam)
+{
+	WORD nId = LOWORD(wParam);//低阶字节表示控件ID
+	WORD nNotiCode = HIWORD(wParam);//高阶字节表示消息（官方规定，F1查看）
+	switch(nNotiCode)
+	{
+	case BN_CLICKED://单击
+		switch (nId)
+		{
+		case IDC_BUTTON1:
+		{
+			HWND hEdit = GetDlgItem(hwnd, IDC_EDIT1);//获取编辑框句柄
+			char szText[100] = { 0 };//定义一个字符数组，用于存储编辑框的文本内容
+			SendMessage(hEdit, WM_GETTEXT, sizeof(szText), (LPARAM)szText);//向编辑框发送消息，设置文本内容
+			int ret = atoi(szText);//将字符串转换为整数)
+			if (ret == 3)
+			{
+				MessageBox(NULL, "验证成功", "Edit Text", MB_OK);//显示编辑框的文本内容
+			}
+			break;
+		}
+		case IDC_BUTTON2:
+		{
+			HWND hEdit = GetDlgItem(hwnd, IDC_EDIT1);//获取编辑框句柄
+			char szText[100] = { 0 };//定义一个字符数组，用于存储编辑框的文本内容
+			SendMessage(hEdit, WM_GETTEXT, sizeof(szText), (LPARAM)szText);//向编辑框发送消息，设置文本内容
+			MessageBox(NULL, szText, "Edit Text", MB_OK);//显示编辑框的文本内容
+			break;
+		}
+		default:
+			break;
+		}
+	    
+	break;
+	}
+}
+
+INT_PTR CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_COMMAND://菜单消息
+		OnCommnd(hwnd, wParam, lParam);
+		break;
+	case WM_CLOSE://关闭窗口
+		PostQuitMessage(0);
+		break;
+	default:
+		return FALSE;
+	}
+	return TRUE;
+}
+
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+                     _In_opt_ HINSTANCE hPrevInstance,
+                     _In_ LPWSTR    lpCmdLine,
+                     _In_ int       nCmdShow)
+{
+	HWND hWnd = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, DlgProc);
+
+	ShowWindow(hWnd, SW_SHOW);
+
+	MSG msg = { 0 };
+	while (GetMessage(&msg, NULL, 0, 0))
+	{
+		TranslateMessage(&msg);//使编辑框等控件可以输入中文
+		DispatchMessage(&msg);
+		
+	}
+	return 1;
+}
